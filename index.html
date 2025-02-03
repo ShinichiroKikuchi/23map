@@ -5,9 +5,11 @@
     <title>23区地図</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
+        /* 地図 */
+        #map-container { width: 100%; max-width: 800px; margin: auto; }
         svg { width: 100%; height: auto; }
         path { cursor: pointer; }
-        text { font-size: 6px; font-family: Arial, sans-serif; fill: black; pointer-events: none; }
+        /* text { font-size: 6px; font-family: Arial, sans-serif; fill: black; pointer-events: none; } */
 
         /* 色がついた区のリスト */
         #selected-areas-container {
@@ -21,6 +23,15 @@
             list-style: none;
             padding: 0;
             width: 600px;
+        }
+
+	    /* スマホ対応 */
+        @media (max-width: 600px) {
+            #selected-areas {
+                grid-template-columns: repeat(2, 1fr); /* スマホでは2列 */
+                grid-template-rows: repeat(12, auto);
+                font-size: 14px; /* 文字サイズを小さく */
+            }
         }
     </style>
 </head>
