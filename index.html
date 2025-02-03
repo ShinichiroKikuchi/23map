@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>23区地図</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        svg { width: 100%; height: auto; }
+        path { cursor: pointer; }
+        text { font-size: 6px; font-family: Arial, sans-serif; fill: black; pointer-events: none; }
+
+        /* 色がついた区のリスト */
+        #selected-areas-container {
+            margin-top: 20px;
+        }
+        #selected-areas {
+            display: grid;
+            grid-template-columns: repeat(4, auto); /* 4列 */
+            grid-template-rows: repeat(6, auto); /* 6行 */
+            gap: 5px; /* 隙間を少し開ける */
+            list-style: none;
+            padding: 0;
+            width: 600px;
+        }
+    </style>
+</head>
+<body>
+<h3>23区巡り</h3>
+<svg id="map" viewBox="450 85 800 300" xmlns="http://www.w3.org/2000/svg">
+		<path
+			id="13101"
+			name="千代田区"
+			fill="white"
+			stroke="black"
+			d="m 636,223 7,5 8,1 9,-12 -2,-6 11,-8 -9,-8 -2,5 -17,-3 -11,13 v 7 z"
+		></path>
+		<path
+			id="13102"
+			name="中央区"
+			fill="white"
+			stroke="black"
+			d="m 656,245 7,7 12,-10 -2,-18 4,-10 -2,-4 -1,-4 v -1 l -5,-2 -11,8 2,6 -9,12 3,3 -2,6 5,4 z"
+		></path>
+		<path
+			id="13103"
+			name="港区"
+			fill="white"
+			stroke="black"
+			d="m 614,232 2,7 8,2 v 9 l -3,5 -1,6 h 6 l 3,3 4,8 17,-1 2,-3 v -6 l -5,-1 1,-4 5,2 -1,-8 1,-6 h 3 l 1,-3 -5,-4 2,-6 -3,-3 -8,-1 -7,-5 -6,-6 -8,2 -3,6 z m 47,40 8,-6 -4,-6 -4,3 3,-2 2,3 -7,5 z"
+		></path>
+		<path
+			id="13104"
+			name="新宿区"
+			fill="white"
+			stroke="black"
+			d="m 641,197 -2,-5 -8,1 -8,-5 -12,-1 -1,-9 -16,1 -5,-7 -3,10 4,1 2,5 1,2 9,-1 -5,4 -3,14 1,7 2,3 9,-7 5,1 7,7 -2,6 3,1 3,-6 8,-2 v -7 z"
+		></path>
+		<path
+			id="13105"
+			name="文京区"
+			fill="white"
+			stroke="black"
+			d="m 658,184 -4,-5 v -8 l -1,-2 -7,-2 -2,2 -4,-3 -6,6 v 4 l -9,-1 v 6 l -5,2 1,4 2,1 8,5 8,-1 2,5 17,3 2,-5 1,-3 -4,-1 -2,-8 z"
+		></path>
+		<path
+			id="13106"
+			name="台東区"
+			fill="white"
+			stroke="black"
+			d="m 669,203 5,2 14,-23 2,-9 -14,-3 -9,6 -13,-5 v 8 l 4,5 -3,-1 2,8 4,1 -1,3 z"
+		></path>
+		<path
+			id="13107"
+			name="墨田区"
+			fill="white"
+			stroke="black"
+			d="m 674,206 1,4 15,2 2,-5 6,-1 -1,-14 13,5 3,-7 -5,-5 7,-4 -17,-22 -4,4 -4,10 -2,9 -14,23 z"
+		></path>
+		<path
+			id="13108"
+			name="江東区"
+			fill="white"
+			stroke="black"
+			d="m 663,252 10,16 4,-2 5,7 3,-4 -2,-9 5,-1 v -3 l 21,-4 v 9 l -10,3 15,-2 1,-19 3,-3 1,-36 -9,-7 -13,-5 1,14 -6,1 -2,5 -15,-2 2,4 -4,10 2,18 z m 36,5 v 5 l 3,-1 v -3 l 6,-2 h -6 l 1,-2 z m 4,8 1,10 3,-1 3,8 4,-18 z m -34,1 -8,6 2,3 10,17 4,-7 -9,-14 3,-2 z m 3,4 7,11 2,-4 -6,-9 z"
+		></path>
+		<path
+			id="13109"
+			name="品川区"
+			fill="white"
+			stroke="black"
+			d="m 609,293 9,1 3,8 7,-3 2,7 13,-3 6,1 v 4 h 5 v -9 l 4,2 5,-3 -11,-19 v -11 l -2,3 -17,1 -4,-8 -3,-3 h -6 l 1,-6 h -1 l -4,4 2,8 -15,4 6,2 -6,8 v 6 z m 54,-18 -2,-3 -2,-3 h -1 l 2,7 z"
+		></path>
+		<path
+			id="13110"
+			name="目黒区"
+			fill="white"
+			stroke="black"
+			d="m 603,287 v -6 l 6,-8 -6,-2 15,-4 -2,-8 4,-4 -7,-1 -17,-18 -9,-2 7,11 2,12 -5,13 -14,-6 4,13 -3,9 h 11 l 2,7 v -3 l 4,-1 v -7 z"
+		></path>
+		<path
+			id="13111"
+			name="大田区"
+			fill="white"
+			stroke="black"
+			d="m 663,298 -5,3 -4,-2 v 9 h -5 v -4 l -6,-1 -13,3 -2,-7 -7,3 -3,-8 -9,-1 -6,-6 -8,-5 v 7 l -4,1 v 3 l -2,8 -6,-6 -7,-1 -6,4 4,2 -2,3 9,3 11,24 17,9 -4,8 4,7 11,-2 7,-5 5,3 5,-4 14,1 31,20 8,-16 -18,-29 -11,1 -6,8 -4,-4 -4,2 -8,-7 v -4 h -16 l 31,-3 4,-4 v 4 h 12 l 3,-2 -4,-6 -10,3 6,-7 z m -22,23 4,4 5,-2 -3,-6 z m 9,0 7,6 6,-9 h -12 z"
+		></path>
+		<path
+			id="13112"
+			name="世田谷区"
+			fill="white"
+			stroke="black"
+			d="m 522,273 v 4 h 5 l 17,4 19,15 9,7 2,-3 -4,-2 6,-4 7,1 6,6 2,-8 -2,-7 h -11 l 3,-9 -4,-13 14,6 5,-13 -2,-12 -7,-11 -4,-8 h -6 l -18,6 -11,-5 -10,-5 4,6 h -6 l -2,-8 -9,-3 h -2 -5 l 2,7 -4,1 5,4 v 3 l -2,2 5,12 v 5 h -4 l -2,5 7,13 z"
+		></path>
+		<path
+			id="13113"
+			name="渋谷区"
+			fill="white"
+			stroke="black"
+			d="m 587,234 9,2 17,18 7,1 h 1 l 3,-5 v -9 l -8,-2 -2,-7 5,-7 -3,-1 2,-6 -7,-7 -5,-1 -9,7 -2,-3 -1,-7 -15,15 -2,4 h 6 z"
+		></path>
+		<path
+			id="13114"
+			name="中野区"
+			fill="white"
+			stroke="black"
+			d="m 581,208 -6,4 4,10 15,-15 3,-14 5,-4 -9,1 -1,-2 -2,-5 -4,-1 3,-10 v -1 l -5,-3 -9,8 h -12 l -9,-9 h -4 l -2,5 6,12 15,7 h 5 l 2,13 5,1 z"
+		></path>
+		<path
+			id="13115"
+			name="杉並区"
+			fill="white"
+			stroke="black"
+			d="m 579,222 -4,-10 6,-4 v -3 l -5,-1 -2,-13 h -5 l -15,-7 -6,-12 -15,3 -8,8 -5,-2 -1,8 7,6 -7,11 6,4 -3,2 3,5 9,3 2,8 h 6 l -4,-6 10,5 11,5 18,-6 z"
+		></path>
+		<path
+			id="13116"
+			name="豊島区"
+			fill="white"
+			stroke="black"
+			d="m 646,167 -8,-7 -6,1 -1,-4 -4,1 -2,4 -4,-5 h -7 l -5,9 -4,-6 -5,-1 -9,4 -1,6 -1,2 v 1 l 5,7 16,-1 1,9 12,1 -2,-1 -1,-4 5,-2 v -6 l 9,1 v -4 l 6,-6 4,3 z"
+		></path>
+		<path
+			id="13117"
+			name="北区"
+			fill="white"
+			stroke="black"
+			d="m 646,167 7,2 3,-3 4,-2 -2,-3 -14,-9 1,-3 5,-1 -7,-4 8,-6 v -4 l -10,3 -8,-5 2,-8 v -7 h -10 l -3,-3 -11,-1 -7,-6 h -1 l -5,11 5,4 5,-1 3,16 7,6 5,9 -2,5 4,5 2,-4 4,-1 1,4 6,-1 z"
+		></path>
+		<path
+			id="13118"
+			name="荒川区"
+			fill="white"
+			stroke="black"
+			d="m 654,171 13,5 9,-6 14,3 4,-10 -17,-2 -3,-5 2,-4 -5,-3 -21,-1 -5,1 -1,3 14,9 2,3 -4,2 -3,3 z"
+		></path>
+		<path
+			id="13119"
+			name="板橋区"
+			fill="white"
+			stroke="black"
+			d="m 623,152 -5,-9 -7,-6 -3,-16 -5,1 -5,-4 5,-11 -29,-2 -9,3 h -4 l -3,6 -10,10 v 1 l 8,10 6,-2 20,3 4,9 -1,13 6,1 v 4 l 9,-4 5,1 4,6 5,-9 h 7 z"
+		></path>
+		<path
+			id="13120"
+			name="練馬区"
+			fill="white"
+			stroke="black"
+			d="m 503,180 16,9 1,-8 5,2 8,-8 15,-3 2,-5 h 4 l 9,9 h 12 l 9,-8 5,3 1,-2 1,-6 v -4 l -6,-1 1,-13 -4,-9 -20,-3 -6,2 -8,-10 -1,11 -4,1 -2,-4 -13,2 5,-5 -6,-3 v -1 h -2 -4 l -5,7 -9,5 v 2 l -6,2 5,11 z"
+		></path>
+		<path
+			id="13121"
+			name="足立区"
+			fill="white"
+			stroke="black"
+			d="m 694,143 h 4 l 2,4 1,-6 4,4 2,-6 4,1 6,-6 10,3 -10,-20 1,-9 -7,-4 -9,7 -4,-7 3,-10 -3,-3 v 3 l -4,3 -13,3 -13,-1 -10,-10 -10,4 -4,4 8,14 -4,7 h -6 l -7,6 -2,8 8,5 10,-3 v 4 l -8,6 7,4 21,1 5,3 -2,4 3,5 17,2 4,-4 -5,-11 z"
+		></path>
+		<path
+			id="13122"
+			name="葛飾区"
+			fill="white"
+			stroke="black"
+			d="m 715,181 7,8 6,-3 6,2 4,-24 h 3 l 7,-8 -4,-4 7,-1 -8,-16 2,-4 9,-6 v -4 l -13,2 -4,-6 4,-6 -2,-3 -12,2 -2,4 -7,-6 -1,9 10,20 -10,-3 -6,6 -4,-1 -2,6 -4,-4 -1,6 -2,-4 h -4 l -1,5 5,11 z"
+		></path>
+		<path
+			id="13123"
+			name="江戸川区"
+			fill="white"
+			stroke="black"
+			d="m 710,197 9,7 -1,36 h 4 l -1,14 8,3 10,-1 8,-5 3,-10 -1,-15 -1,-1 1,-6 16,-5 9,-13 -2,-9 -12,-13 -3,-6 3,-13 -8,-8 -1,-1 -7,1 4,4 -7,8 h -3 l -4,24 -6,-2 -6,3 -7,-8 -7,4 5,5 z m 11,63 v -3 l 6,1 v 3 l 1,-2 -6,-3 z m 7,1 2,-2 5,2 -1,2 1,-2 -4,-2 z"
+		></path>
+	</svg>
+
+	<div id="selected-areas-container">
+	    <h3>色がついた区</h3>
+	    <ul id="selected-areas"></ul>
+	</div>
+
+    <script>
+        // 色のリスト
+        //const colors = ["#FFA0FF", "#A0FFFF", "#A0FFA0", "#FFFFA0"];
+        const highlightColor = "#FFA0FF";
+
+        // 色がついた区のリスト
+        const selectedAreas = new Set(); 
+
+        // クリックで色をトグル & リスト更新
+        d3.selectAll("path").on("click", function() {
+            let currentColor = d3.select(this).attr("fill");
+            let newColor = (currentColor === "white") ? highlightColor : "white";
+            d3.select(this).attr("fill", newColor);
+
+            let areaName = d3.select(this).attr("name");
+
+            if (newColor === highlightColor) {
+                selectedAreas.add(areaName);
+            } else {
+                selectedAreas.delete(areaName);
+            }
+
+            updateSelectedAreasList();
+        });
+
+        // 選択された区のリストを更新
+        function updateSelectedAreasList() {
+            let list = document.getElementById("selected-areas");
+            list.innerHTML = "";
+            selectedAreas.forEach(name => {
+                let li = document.createElement("li");
+                li.textContent = name;
+                list.appendChild(li);
+            });
+        }
+
+        // テキスト
+        const labels = {
+            "13101": { "name": "千代田区", "x": 633, "y": 215 },
+            "13102": { "name": "中央区", "x": 655, "y": 235 },
+            "13103": { "name": "港区", "x": 630, "y": 240 },
+            "13104": { "name": "新宿区", "x": 607, "y": 203 },
+            "13105": { "name": "文京区", "x": 630, "y": 185 },
+            "13106": { "name": "台東区", "x": 663, "y": 188 },
+            "13107": { "name": "墨田区", "x": 690, "y": 182 },
+            "13108": { "name": "江東区", "x": 685, "y": 235 },
+            "13109": { "name": "品川区", "x": 620, "y": 290 },
+            "13110": { "name": "目黒区", "x": 585, "y": 278 },
+            "13111": { "name": "大田区", "x": 600, "y": 320 },
+            "13112": { "name": "世田谷区", "x": 540, "y": 260 },
+            "13113": { "name": "渋谷区", "x": 590, "y": 230 },
+            "13114": { "name": "中野区", "x": 563, "y": 185 },
+            "13115": { "name": "杉並区", "x": 540, "y": 210 },
+            "13116": { "name": "豊島区", "x": 600, "y": 174 },
+            "13117": { "name": "北区", "x": 625, "y": 145 },
+            "13118": { "name": "荒川区", "x": 665, "y": 168 },
+            "13119": { "name": "板橋区", "x": 590, "y": 145 },
+            "13120": { "name": "練馬区", "x": 530, "y": 160 },
+            "13121": { "name": "足立区", "x": 670, "y": 130 },
+            "13122": { "name": "葛飾区", "x": 715, "y": 160 },
+            "13123": { "name": "江戸川区", "x": 730, "y": 210 }
+        };
+
+        // D3.jsでテキスト追加
+        const svg = d3.select("#map");
+        Object.keys(labels).forEach(id => {
+            let data = labels[id];
+            svg.append("text")
+                .attr("x", data.x)
+                .attr("y", data.y)
+                .text(data.name);
+        });
+    </script>
+</body>
+<!-- 地図の元ネタ：https://www.danyelkoca.com/jp/blog/tokyo -->
+</html>
